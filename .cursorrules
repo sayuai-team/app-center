@@ -1,0 +1,109 @@
+# Cursor Rules for App Center Project
+
+## Project Overview
+This is a TypeScript monorepo with:
+- Frontend: Next.js 15 + React 19 + Tailwind CSS + Shadcn UI
+- Backend: Express.js + Better SQLite3 + TypeScript
+- Package Manager: pnpm with workspaces
+- Architecture: Full-stack mobile app distribution center
+
+## Code Style & Standards
+
+### TypeScript
+- Always use TypeScript strict mode
+- Prefer type safety over any types
+- Use proper interface definitions for API contracts
+- Import types with `import type` syntax when possible
+- Use shared types from `@app-center/shared` package
+
+### React/Next.js Guidelines
+- Use functional components with hooks
+- Prefer server components when possible in Next.js 15
+- Use the app router for new routes
+- Implement proper error boundaries
+- Use Tailwind CSS for styling with consistent design tokens
+- Follow Shadcn UI patterns for accessible components
+
+### Backend Guidelines  
+- Use Express.js with proper middleware organization
+- Implement proper error handling and validation with Zod
+- Use Better SQLite3 with prepared statements
+- Follow RESTful API conventions
+- Implement proper authentication and authorization
+- Use proper logging with Morgan
+
+### File Organization
+- Keep components in `frontend/components/`
+- Keep API routes in `frontend/app/api/` and `backend/src/routes/`
+- Keep shared types in `shared/types/`
+- Use proper barrel exports (index.ts files)
+- Group related functionality in folders
+
+## Security Best Practices
+- Validate all inputs with Zod schemas
+- Use proper sanitization for file uploads
+- Implement rate limiting on API endpoints
+- Use helmet for security headers
+- Never commit sensitive credentials
+- Use environment variables for configuration
+
+## Performance Guidelines
+- Implement proper caching strategies
+- Use Next.js Image component for images
+- Optimize database queries with proper indexing
+- Use compression middleware
+- Implement pagination for large datasets
+
+## Testing & Quality
+- Write meaningful commit messages in English
+- Use TypeScript strict mode
+- Run linting and type checking before commits
+- Test API endpoints thoroughly
+- Use proper error handling patterns
+
+## Code Patterns to Follow
+
+### API Response Format
+```typescript
+interface ApiResponse<T = any> {
+  code: string;
+  data?: T;
+  message: string;
+}
+```
+
+### Error Handling
+- Use try-catch blocks in async functions
+- Return consistent error responses
+- Log errors properly with context
+- Use proper HTTP status codes
+
+### Database Operations
+- Use prepared statements
+- Implement proper transaction handling
+- Use proper connection management
+- Handle database errors gracefully
+
+## Avoid These Patterns
+- Don't use `any` type without good reason
+- Don't skip error handling
+- Don't hardcode configuration values
+- Don't expose sensitive information in client-side code
+- Don't use deprecated React patterns (class components, etc.)
+- Don't ignore TypeScript warnings
+- Don't create markdown documentation files unless explicitly requested
+
+## Helpful Commands
+- `pnpm dev` - Start development servers
+- `pnpm build` - Build all packages
+- `pnpm lint` - Run linting
+- `pnpm type-check` - Type checking
+- `pnpm clean` - Clean build artifacts
+
+## Dependencies Management
+- Use exact versions for critical dependencies
+- Keep dependencies up to date
+- Use workspace dependencies with `workspace:*`
+- Prefer peer dependencies when appropriate
+
+Remember: Always prioritize type safety, security, and maintainability over quick fixes. 

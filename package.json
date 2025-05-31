@@ -1,0 +1,34 @@
+{
+  "name": "app-center",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm run dev:backend & pnpm run dev:frontend & wait",
+    "dev:backend": "pnpm --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "build": "pnpm run build:shared && pnpm run --filter '{backend,frontend}' build",
+    "build:shared": "pnpm --filter shared build",
+    "build:backend": "pnpm --filter backend build",
+    "build:frontend": "pnpm --filter frontend build",
+    "start": "pnpm run --parallel '/^start:.*/'",
+    "start:backend": "pnpm --filter backend start",
+    "start:frontend": "pnpm --filter frontend start",
+    "lint": "pnpm run --parallel '/^lint:.*/'",
+    "lint:backend": "pnpm --filter backend lint",
+    "lint:frontend": "pnpm --filter frontend lint",
+    "type-check": "pnpm run --filter '{backend,frontend}' type-check",
+    "clean": "pnpm run --parallel '/^clean:.*/'",
+    "clean:backend": "pnpm --filter backend clean",
+    "clean:frontend": "pnpm --filter frontend clean",
+    "init-db": "pnpm --filter backend init-db"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
