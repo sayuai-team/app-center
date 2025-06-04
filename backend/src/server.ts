@@ -1,3 +1,19 @@
+import path from 'path';
+import dotenv from 'dotenv';
+
+// Load environment variables first, before any other imports
+// Load .env from the backend directory (where this server runs)
+console.log('🔍 当前工作目录:', process.cwd());
+console.log('🔍 查找 .env 文件路径:', path.resolve(process.cwd(), '.env'));
+
+const envResult = dotenv.config();
+if (envResult.error) {
+  console.log('❌ .env 文件加载失败:', envResult.error.message);
+} else {
+  console.log('✅ .env 文件加载成功');
+  console.log('🔍 PORT 环境变量:', process.env.PORT);
+}
+
 import express, { Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,8 +22,6 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import { createServer } from 'https';
 import { readFileSync } from 'fs';
-import path from 'path';
-import dotenv from 'dotenv';
 
 import { errorHandler, setupGlobalErrorHandlers } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
@@ -22,9 +36,6 @@ import downloadRoutes from './routes/download';
 import versionRoutes from './routes/versions';
 import fileRoutes from './routes/files';
 import healthRoutes from './routes/health';
-
-// Load environment variables
-dotenv.config();
 
 // 启用全局错误处理
 setupGlobalErrorHandlers();
