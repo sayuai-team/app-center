@@ -1,0 +1,59 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# App Center Project Rules
+
+## Project Overview
+This is a TypeScript monorepo with:
+- Frontend: Next.js 15 + React 19 + Tailwind CSS + Shadcn UI  
+- Backend: Express.js + Better SQLite3 + TypeScript
+- Package Manager: pnpm with workspaces
+- Architecture: Full-stack mobile app distribution center
+
+## General Standards
+
+### TypeScript
+- Always use TypeScript strict mode
+- Prefer type safety over any types
+- Use proper interface definitions for API contracts
+- Import types with `import type` syntax when possible
+- Use shared types from `@app-center/shared` package
+
+### File Organization
+- Keep components in `frontend/components/`
+- Keep API routes in `frontend/app/api/` and `backend/src/routes/`
+- Keep shared types in `shared/types/`
+- Use proper barrel exports (index.ts files)
+- Group related functionality in folders
+
+## Security Best Practices
+- Validate all inputs with Zod schemas
+- Use proper sanitization for file uploads
+- Implement rate limiting on API endpoints
+- Use helmet for security headers
+- Never commit sensitive credentials
+- Use environment variables for configuration
+
+## Testing & Quality
+- Write meaningful commit messages in English
+- Use TypeScript strict mode
+- Run linting and type checking before commits
+- Test API endpoints thoroughly
+- Use proper error handling patterns
+
+## Helpful Commands
+- `pnpm dev` - Start development servers
+- `pnpm build` - Build all packages
+- `pnpm lint` - Run linting
+- `pnpm type-check` - Type checking
+- `pnpm clean` - Clean build artifacts
+
+## Dependencies Management
+- Use exact versions for critical dependencies
+- Keep dependencies up to date
+- Use workspace dependencies with `workspace:*`
+- Prefer peer dependencies when appropriate
+
+Remember: Always prioritize type safety, security, and maintainability over quick fixes.

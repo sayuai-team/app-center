@@ -1,0 +1,42 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Frontend Rules for App Center
+
+## React/Next.js Guidelines
+- Use functional components with hooks
+- Prefer server components when possible in Next.js 15
+- Use the app router for new routes
+- Implement proper error boundaries
+- Use Tailwind CSS for styling with consistent design tokens
+- Follow Shadcn UI patterns for accessible components
+
+## Component Patterns
+- Keep components in `frontend/components/`
+- Use proper prop interfaces with TypeScript
+- Implement loading and error states
+- Use React Suspense for data fetching
+- Follow composition over inheritance
+
+## Styling Guidelines
+- Use Tailwind CSS for all styling
+- Follow consistent design tokens
+- Use CSS modules only when Tailwind is insufficient
+- Implement responsive design mobile-first
+- Use proper semantic HTML elements
+
+## Performance Guidelines
+- Use Next.js Image component for images
+- Implement proper lazy loading
+- Use React.memo for expensive components
+- Optimize bundle size with dynamic imports
+- Implement proper caching strategies
+
+## Avoid These Patterns
+- Don't use deprecated React patterns (class components, etc.)
+- Don't expose sensitive information in client-side code
+- Don't ignore accessibility best practices
+- Don't skip error boundaries
+- Don't hardcode API endpoints

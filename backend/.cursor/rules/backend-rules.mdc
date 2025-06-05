@@ -1,0 +1,55 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Backend Rules for App Center
+
+## Express.js Guidelines  
+- Use Express.js with proper middleware organization
+- Implement proper error handling and validation with Zod
+- Follow RESTful API conventions
+- Implement proper authentication and authorization
+- Use proper logging with Morgan
+- Use helmet for security headers
+
+## Database Operations
+- Use Better SQLite3 with prepared statements
+- Implement proper transaction handling
+- Use proper connection management
+- Handle database errors gracefully
+- Optimize queries with proper indexing
+- Implement pagination for large datasets
+
+## API Response Format
+Always use this consistent format:
+
+```typescript
+interface ApiResponse<T = any> {
+  code: string;
+  data?: T;
+  message: string;
+}
+```
+
+## Error Handling
+- Use try-catch blocks in async functions
+- Return consistent error responses
+- Log errors properly with context
+- Use proper HTTP status codes
+- Implement proper validation middleware
+
+## Security Practices
+- Validate all inputs with Zod schemas
+- Use proper sanitization for file uploads
+- Implement rate limiting on API endpoints
+- Never expose sensitive information in responses
+- Use environment variables for configuration
+- Implement proper CORS settings
+
+## Performance
+- Use compression middleware
+- Implement proper caching strategies
+- Optimize database queries
+- Use connection pooling when appropriate
+- Monitor response times and memory usage
