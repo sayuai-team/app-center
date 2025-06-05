@@ -40,7 +40,7 @@ const DEFAULT_ACTIVITY_BAR_WIDTH = 64;
 const DEFAULT_PRIMARY_SIDEBAR = {
   preferredSize: 280,
   minSize: 200,
-  maxSize: 400
+  maxSize: 350
 };
 const DEFAULT_SECONDARY_SIDEBAR = {
   preferredSize: 300,
@@ -149,7 +149,7 @@ export function AppCenterLayout({
 
         {/* Main Content */}
         {mainContent && (
-          <Allotment.Pane>
+          <Allotment.Pane minSize={400}>
             <div className="h-full bg-background">
               <div className="flex h-full w-full flex-col overflow-auto">
                 <div className="flex-1 overflow-auto">

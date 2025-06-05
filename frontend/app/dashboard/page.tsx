@@ -119,7 +119,7 @@ export default function DashboardPage() {
         primarySidebar: {
           preferredSize: 280,
           minSize: 200,
-          maxSize: 400
+          maxSize: 350
         }
       }}
       user={userData}
