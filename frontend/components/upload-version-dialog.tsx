@@ -134,18 +134,38 @@ export function UploadVersionDialog({
         requireAuth: false, // 文件上传不需要认证
       })
       
-      if (result.data?.fileId && result.data?.appInfo) {
-        setFileId(result.data.fileId)
-        setParsedAppInfo(result.data.appInfo)
+      // 详细调试信息
+      console.log('=== 文件上传API响应详情 ===');
+      console.log('完整响应:', result);
+      console.log('响应类型:', typeof result);
+      console.log('是否为对象:', result && typeof result === 'object');
+      console.log('fileId 存在:', 'fileId' in result);
+      console.log('appInfo 存在:', 'appInfo' in result);
+      console.log('data 存在:', 'data' in result);
+      
+      if (result.data) {
+        console.log('result.data:', result.data);
+        console.log('result.data.fileId:', result.data.fileId);
+        console.log('result.data.appInfo:', result.data.appInfo);
+      }
+      
+      // 检查多种可能的响应格式
+      const fileId = result.fileId || result.data?.fileId;
+      const appInfo = result.appInfo || result.data?.appInfo;
+      
+      if (fileId && appInfo) {
+        setFileId(fileId)
+        setParsedAppInfo(appInfo)
         setVersionData({
-          version: result.data.appInfo.versionName || '',
-          buildNumber: result.data.appInfo.versionCode || '',
+          version: appInfo.versionName || '',
+          buildNumber: appInfo.versionCode || '',
           updateContent: ''
         })
         setUploadState('completed')
         toast.success('文件上传成功，已自动解析应用信息')
       } else {
-        throw new Error('无法解析应用信息')
+        console.error('上传响应格式错误:', { result, fileId, appInfo });
+        throw new Error('无法解析应用信息: ' + JSON.stringify({ fileId: !!fileId, appInfo: !!appInfo }))
       }
     } catch (error) {
       setUploadState('error')

@@ -242,22 +242,24 @@ export function CreateAppDialog({ children, onSuccess, mode = "create", app }: C
               onChange={(e) => handleInputChange('name', e.target.value)}
               onFocus={(e) => {
                 // 编辑模式下阻止自动全选文本
-                if (mode === "edit") {
+                if (mode === "edit" && e.target) {
                   setTimeout(() => {
-                    e.target.setSelectionRange(e.target.value.length, e.target.value.length)
+                    if (e.target && 'setSelectionRange' in e.target) {
+                      (e.target as HTMLInputElement).setSelectionRange(e.target.value.length, e.target.value.length)
+                    }
                   }, 0)
                 }
               }}
               onMouseUp={(e) => {
                 // 编辑模式下阻止鼠标选中文本的默认行为
-                if (mode === "edit") {
+                if (mode === "edit" && e.currentTarget) {
                   e.preventDefault()
                   e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)
                 }
               }}
               onClick={(e) => {
                 // 编辑模式下点击时将光标移到末尾
-                if (mode === "edit") {
+                if (mode === "edit" && e.currentTarget) {
                   setTimeout(() => {
                     e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)
                   }, 0)
