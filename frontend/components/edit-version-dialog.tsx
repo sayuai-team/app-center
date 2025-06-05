@@ -12,7 +12,7 @@ import { toast } from 'sonner'
 import { Package, Edit3, CheckCircle, Clock } from 'lucide-react'
 import { Version } from '@app-center/shared'
 import { config } from '@/lib/config'
-import { buildApiUrl } from '@/lib/api'
+import { buildApiUrl, apiRequest, API_ENDPOINTS } from '@/lib/api'
 
 interface EditVersionDialogProps {
   open: boolean
@@ -49,21 +49,13 @@ export function EditVersionDialog({
 
     setIsLoading(true)
     try {
-      const response = await fetch(buildApiUrl(`/api/v1/apps/${version.appId}/versions/${version.id}/update`), {
+      await apiRequest(API_ENDPOINTS.VERSIONS.UPDATE(version.appId, version.id), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           updateContent: formData.updateContent,
           status: formData.status
         }),
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || '更新失败')
-      }
 
       toast.success('版本更新成功！')
       onSuccess()

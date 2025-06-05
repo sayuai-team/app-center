@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Smartphone, Monitor, Download, Package, Calendar, FileText, Shield, Hash, ChevronDown, ChevronUp } from "lucide-react"
+import { apiRequestPublic, DownloadUrls } from "@/lib/api"
 
 export default function DownloadPage() {
   const params = useParams()
@@ -64,11 +65,8 @@ export default function DownloadPage() {
   useEffect(() => {
     const fetchApp = async () => {
       try {
-        const response = await fetch(`/api/app/${downloadKey}`)
-        if (!response.ok) {
-          throw new Error('应用不存在或已下架')
-        }
-        const appData = await response.json()
+        // 直接调用后端API，不需要认证
+        const appData = await apiRequestPublic(`/api/v1/download/${downloadKey}`)
         setApp(appData)
         // selectedVersion 将在版本历史加载后设置
       } catch (err) {
@@ -90,31 +88,29 @@ export default function DownloadPage() {
       
       setVersionsLoading(true)
       try {
-        const response = await fetch(`/api/app/${downloadKey}/versions`)
-        if (response.ok) {
-          const versions = await response.json()
-          // 获取最近10个版本，按上传时间倒序
-          const recentVersions = versions
-            .sort((a: any, b: any) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime())
-            .slice(0, 10)
-          setVersionHistory(recentVersions)
-          
-          // 根据设备类型过滤版本，然后选择默认版本
-          const filteredVersions = getFilteredVersions(recentVersions)
-          
-          // 默认选中最近的版本（第一个）
-          if (filteredVersions.length > 0 && !selectedVersion) {
-            const latestVersion = filteredVersions[0]
-            setSelectedVersion(latestVersion)
-            // 更新应用信息显示最新版本
-            setApp(prev => prev ? {
-              ...prev,
-              version: latestVersion.version,
-              buildNumber: latestVersion.buildNumber,
-              uploadDate: latestVersion.uploadDate,
-              downloadUrl: latestVersion.downloadUrl
-            } : latestVersion)
-          }
+        // 直接调用后端API，不需要认证
+        const versions = await apiRequestPublic(`/api/v1/download/${downloadKey}/versions`)
+        // 获取最近10个版本，按上传时间倒序
+        const recentVersions = versions
+          .sort((a: any, b: any) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime())
+          .slice(0, 10)
+        setVersionHistory(recentVersions)
+        
+        // 根据设备类型过滤版本，然后选择默认版本
+        const filteredVersions = getFilteredVersions(recentVersions)
+        
+        // 默认选中最近的版本（第一个）
+        if (filteredVersions.length > 0 && !selectedVersion) {
+          const latestVersion = filteredVersions[0]
+          setSelectedVersion(latestVersion)
+          // 更新应用信息显示最新版本
+          setApp(prev => prev ? {
+            ...prev,
+            version: latestVersion.version,
+            buildNumber: latestVersion.buildNumber,
+            uploadDate: latestVersion.uploadDate,
+            downloadUrl: latestVersion.downloadUrl
+          } : latestVersion)
         }
       } catch (err) {
         console.error('获取版本历史失败:', err)
@@ -201,15 +197,15 @@ export default function DownloadPage() {
       }
       
       // iOS应用需要通过plist文件安装
-      const plistUrl = selectedVersion 
-        ? `/api/app/${downloadKey}/plist?version=${selectedVersion.id}`
-        : `/api/app/${downloadKey}/plist`
-      const installUrl = `itms-services://?action=download-manifest&url=${encodeURIComponent(
-        window.location.origin + plistUrl
-      )}`
+      const installUrl = selectedVersion 
+        ? DownloadUrls.getInstallUrl(downloadKey, selectedVersion.id)
+        : DownloadUrls.getInstallUrl(downloadKey)
       
       // 添加调试信息
-      console.log('Plist URL:', window.location.origin + plistUrl)
+      const plistUrl = selectedVersion 
+        ? DownloadUrls.getPlistUrl(downloadKey, selectedVersion.id)
+        : DownloadUrls.getPlistUrl(downloadKey)
+      console.log('Plist URL:', plistUrl)
       console.log('Install URL:', installUrl)
       
       // 尝试安装
@@ -235,12 +231,9 @@ export default function DownloadPage() {
 
     const system = selectedVersion?.platform || app?.system
     if (system === 'iOS') {
-      const plistUrl = selectedVersion 
-        ? `/api/app/${downloadKey}/plist?version=${selectedVersion.id}`
-        : `/api/app/${downloadKey}/plist`
-      const installUrl = `itms-services://?action=download-manifest&url=${encodeURIComponent(
-        window.location.origin + plistUrl
-      )}`
+      const installUrl = selectedVersion 
+        ? DownloadUrls.getInstallUrl(downloadKey, selectedVersion.id)
+        : DownloadUrls.getInstallUrl(downloadKey)
       
       // 尝试在新窗口中打开
       const newWindow = window.open(installUrl, '_blank')
@@ -469,8 +462,8 @@ export default function DownloadPage() {
                       </div>
                     )}
                     <div className="text-xs bg-gray-100 p-2 rounded break-all">
-                      <div>plist: {window.location.origin}/api/app/{downloadKey}/plist{selectedVersion ? `?version=${selectedVersion.id}` : ''}</div>
-                      <div>install: itms-services://?action=download-manifest&url={encodeURIComponent(window.location.origin + `/api/app/${downloadKey}/plist${selectedVersion ? `?version=${selectedVersion.id}` : ''}`)}</div>
+                      <div>plist: {selectedVersion ? DownloadUrls.getPlistUrl(downloadKey, selectedVersion.id) : DownloadUrls.getPlistUrl(downloadKey)}</div>
+                      <div>install: {selectedVersion ? DownloadUrls.getInstallUrl(downloadKey, selectedVersion.id) : DownloadUrls.getInstallUrl(downloadKey)}</div>
                       {selectedVersion && (
                         <div className="mt-1 text-blue-600">IPA文件: {selectedVersion.downloadUrl}</div>
                       )}
@@ -479,7 +472,7 @@ export default function DownloadPage() {
                     <div className="mt-3"><strong>分步测试：</strong></div>
                     <div className="space-y-2">
                       <button 
-                        onClick={() => window.open(`/api/app/${downloadKey}/plist${selectedVersion ? `?version=${selectedVersion.id}` : ''}`, '_blank')}
+                        onClick={() => window.open(selectedVersion ? DownloadUrls.getPlistUrl(downloadKey, selectedVersion.id) : DownloadUrls.getPlistUrl(downloadKey), '_blank')}
                         className="w-full text-left text-xs bg-yellow-100 p-2 rounded border"
                       >
                         1. 测试plist文件 (点击查看XML)
@@ -492,10 +485,9 @@ export default function DownloadPage() {
                       </button>
                       <button 
                         onClick={() => {
-                          const plistUrl = selectedVersion 
-                            ? `/api/app/${downloadKey}/plist?version=${selectedVersion.id}`
-                            : `/api/app/${downloadKey}/plist`
-                          const installUrl = `itms-services://?action=download-manifest&url=${encodeURIComponent(window.location.origin + plistUrl)}`
+                          const installUrl = selectedVersion 
+                            ? DownloadUrls.getInstallUrl(downloadKey, selectedVersion.id)
+                            : DownloadUrls.getInstallUrl(downloadKey)
                           navigator.clipboard.writeText(installUrl).then(() => alert('安装链接已复制到剪贴板'))
                         }}
                         className="w-full text-left text-xs bg-yellow-100 p-2 rounded border"

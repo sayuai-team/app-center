@@ -19,7 +19,7 @@ import {
   AlertCircle
 } from "lucide-react"
 import { toast } from "sonner"
-import { buildApiUrl, API_ENDPOINTS } from "@/lib/api"
+import { API_ENDPOINTS, apiRequest, apiRequestUpload } from "@/lib/api"
 
 interface AppInfo {
   name: string
@@ -130,17 +130,9 @@ export function UploadVersionDialog({
       clearInterval(progressInterval)
 
       // 使用新的文件上传API
-      const response = await fetch(buildApiUrl(API_ENDPOINTS.FILES.UPLOAD), {
-        method: 'POST',
-        body: formData,
+      const result = await apiRequestUpload(API_ENDPOINTS.FILES.UPLOAD, formData, {
+        requireAuth: false, // 文件上传不需要认证
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || '上传失败')
-      }
-
-      const result = await response.json()
       
       if (result.data?.fileId && result.data?.appInfo) {
         setFileId(result.data.fileId)
@@ -181,11 +173,8 @@ export function UploadVersionDialog({
       setIsSubmitting(true)
       
       // 使用fileId创建版本
-      const response = await fetch(buildApiUrl(API_ENDPOINTS.APPS.VERSIONS(appId)), {
+      await apiRequest(API_ENDPOINTS.APPS.VERSIONS(appId), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           fileId: fileId,
           version: versionData.version,
@@ -194,11 +183,6 @@ export function UploadVersionDialog({
           confirm: true
         }),
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || '创建版本失败')
-      }
 
       toast.success('版本创建成功！')
       onSuccess()

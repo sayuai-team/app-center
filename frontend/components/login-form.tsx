@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { buildApiUrl, API_ENDPOINTS } from "@/lib/api"
+import { apiRequestPublic, API_ENDPOINTS } from "@/lib/api"
 
 export function LoginForm({
   className,
@@ -45,71 +45,44 @@ export function LoginForm({
       console.log('📧 邮箱:', email)
       console.log('🔑 密码长度:', password.length)
       
-      const apiUrl = buildApiUrl(API_ENDPOINTS.AUTH.LOGIN);
-      console.log('🌐 登录API地址:', apiUrl)
+      console.log('🚀 开始登录请求...')
+      console.log('📧 邮箱:', email)
+      console.log('🔑 密码长度:', password.length)
       
-      const response = await fetch(apiUrl, {
+      const data = await apiRequestPublic(API_ENDPOINTS.AUTH.LOGIN, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           email: email,
           password: password,
         }),
       })
 
-      console.log('📥 响应状态:', response.status)
-      console.log('📥 响应头:', Object.fromEntries(response.headers.entries()))
-
-      // 检查响应是否为JSON格式
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        console.error('❌ 服务器返回非JSON响应:', contentType)
-        toast.error('服务器响应格式错误，请检查后端服务')
-        return
-      }
-
-      const data = await response.json()
       console.log('📄 响应数据:', data)
 
-      // 处理成功响应 - 适配新的API响应格式
-      const isSuccess = response.ok && (data.success || data.code === "0");
+      // 保存认证信息
+      localStorage.setItem('authToken', data.token)
+      localStorage.setItem('userInfo', JSON.stringify(data.user))
       
-      if (isSuccess) {
-        // 保存认证信息
-        localStorage.setItem('authToken', data.data.token)
-        localStorage.setItem('userInfo', JSON.stringify(data.data.user))
-        
-        toast.success(data.message || '登录成功！')
-        console.log('✅ 登录成功，跳转到dashboard...')
-        
-        // 跳转到dashboard
-        router.push('/dashboard')
-      } else {
-        // 处理业务逻辑错误（如密码错误）
-        const errorMessage = data.message || '登录失败，请检查用户名和密码'
-        console.log('❌ 登录失败:', errorMessage)
-        
-        // 根据错误类型显示不同颜色的toast
-        if (errorMessage.includes('密码') || errorMessage.includes('用户名') || errorMessage.includes('邮箱')) {
-          toast.error(errorMessage)
-        } else if (errorMessage.includes('禁用') || errorMessage.includes('锁定')) {
-          toast.warning(errorMessage)
-        } else {
-          toast.error(errorMessage)
-        }
-      }
+      toast.success('登录成功！')
+      console.log('✅ 登录成功，跳转到dashboard...')
+      
+      // 跳转到dashboard
+      router.push('/dashboard')
     } catch (error) {
-      console.error('❌ 登录错误详情:', error)
-      console.error('❌ 错误类型:', typeof error)
-      console.error('❌ 错误信息:', error instanceof Error ? error.message : String(error))
+      console.error('❌ 登录失败:', error)
       
-      // 处理网络错误或其他异常
-      if (error instanceof TypeError && error.message.includes('fetch')) {
+      // apiRequestPublic已经自动处理了错误信息
+      const errorMessage = error instanceof Error ? error.message : '登录失败，请稍后重试'
+      
+      // 根据错误类型显示不同颜色的toast
+      if (errorMessage.includes('密码') || errorMessage.includes('用户名') || errorMessage.includes('邮箱')) {
+        toast.error(errorMessage)
+      } else if (errorMessage.includes('禁用') || errorMessage.includes('锁定')) {
+        toast.warning(errorMessage)
+      } else if (errorMessage.includes('网络') || errorMessage.includes('连接')) {
         toast.error('无法连接到服务器，请检查网络连接')
       } else {
-        toast.error('登录时发生未知错误，请稍后重试')
+        toast.error(errorMessage)
       }
     } finally {
       setIsLoading(false)

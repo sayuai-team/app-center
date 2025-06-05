@@ -183,10 +183,11 @@ export const validateRegister = (req: Request, res: Response, next: NextFunction
  * 应用创建/更新验证中间件
  */
 export const validateApp = (req: Request, res: Response, next: NextFunction): void => {
-  const { appName, bundleId, description } = req.body;
+  const { name, appName, bundleId, description } = req.body;
 
-  // 验证应用名称
-  const nameValidation = ValidationRules.isValidAppName(appName);
+  // 验证应用名称 (支持 name 或 appName 字段)
+  const appNameToValidate = appName || name;
+  const nameValidation = ValidationRules.isValidAppName(appNameToValidate);
   if (!nameValidation.valid) {
     res.status(400).json({
       success: false,
