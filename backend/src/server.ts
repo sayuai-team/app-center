@@ -4,9 +4,15 @@ import dotenv from 'dotenv';
 // Load environment variables first, before any other imports
 // Load .env from the backend directory (where this server runs)
 console.log('🔍 当前工作目录:', process.cwd());
-console.log('🔍 查找 .env 文件路径:', path.resolve(process.cwd(), '.env'));
 
-const envResult = dotenv.config();
+// Check if we're running from project root or backend directory
+const envPath = process.cwd().endsWith('/backend') 
+  ? path.resolve(process.cwd(), '.env')
+  : path.resolve(process.cwd(), 'backend', '.env');
+
+console.log('🔍 查找 .env 文件路径:', envPath);
+
+const envResult = dotenv.config({ path: envPath });
 if (envResult.error) {
   console.log('❌ .env 文件加载失败:', envResult.error.message);
 } else {
@@ -14,6 +20,7 @@ if (envResult.error) {
   console.log('🔍 PORT 环境变量:', process.env.PORT);
 }
 
+// Now import everything else after environment variables are loaded
 import express, { Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -137,8 +144,8 @@ const startServer = () => {
   if (config.enableHttps) {
     try {
       const httpsOptions = {
-        key: readFileSync(config.sslKeyPath),
-        cert: readFileSync(config.sslCertPath),
+        key: readFileSync(config.sslKeyPath!),
+        cert: readFileSync(config.sslCertPath!),
       };
 
       createServer(httpsOptions, app).listen(port, host, () => {

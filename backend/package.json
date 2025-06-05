@@ -4,7 +4,7 @@
   "description": "App Center Backend API",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ENABLE_HTTPS=true tsx watch src/server.ts",
+    "dev": "ENABLE_HTTPS=true tsx watch --env-file=.env src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "lint": "eslint src/**/*.ts",
