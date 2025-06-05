@@ -168,10 +168,10 @@ export function AppDetails({ app, onAppUpdate }: AppDetailsProps) {
   }
 
   return (
-    <div className="px-4 lg:px-6">
+    <div className="px-4 lg:px-6 min-w-0 w-full">
       {/* 页面标题区域 */}
-      <div className="flex items-center justify-between space-y-2 mb-8">
-        <div className="flex items-end space-x-4">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 mb-8">
+        <div className="flex items-start space-x-4 min-w-0">
           {/* 二维码区域 */}
           <div className="flex-shrink-0">
             <div className="flex items-center justify-center p-2 bg-white rounded border">
@@ -179,31 +179,31 @@ export function AppDetails({ app, onAppUpdate }: AppDetailsProps) {
                 <img 
                   src={qrCodeDataUrl} 
                   alt="下载二维码" 
-                  className="w-24 h-24 rounded"
+                  className="w-20 h-20 lg:w-24 lg:h-24 rounded"
                 />
               ) : (
-                <div className="w-24 h-24 bg-gray-100 rounded flex items-center justify-center">
-                  <QrCode className="h-10 w-10 text-gray-400" />
+                <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gray-100 rounded flex items-center justify-center">
+                  <QrCode className="h-8 w-8 lg:h-10 lg:w-10 text-gray-400" />
                 </div>
               )}
             </div>
           </div>
           {/* 标题和链接区域 */}
-          <div className="flex-1">
-            <h2 className="text-3xl font-bold tracking-tight">{app.name}</h2>
-            <p className="text-muted-foreground mt-2">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">{app.name}</h2>
+            <p className="text-muted-foreground mt-2 text-sm lg:text-base">
               App Key: {app.appKey}
             </p>
             {/* 下载链接区域 */}
             <div className="mt-3">
               <div className="flex items-center gap-2">
-                <div className="flex-1 text-sm font-mono bg-muted px-3 py-2 rounded max-w-md truncate">
+                <div className="flex-1 text-xs lg:text-sm font-mono bg-muted px-2 lg:px-3 py-2 rounded truncate min-w-0">
                   {`${window.location.origin}/${app.downloadKey}`}
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 flex-shrink-0"
                   onClick={handleCopyUrl}
                   title="复制链接"
                 >
@@ -212,7 +212,7 @@ export function AppDetails({ app, onAppUpdate }: AppDetailsProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 flex-shrink-0"
                   onClick={() => window.open(`/${app.downloadKey}`, '_blank')}
                   title="在新窗口打开"
                 >
@@ -222,13 +222,13 @@ export function AppDetails({ app, onAppUpdate }: AppDetailsProps) {
             </div>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 flex-shrink-0">
           <CreateAppDialog mode="edit" app={app} onSuccess={onAppUpdate}>
-            <Button variant="outline">
+            <Button variant="outline" size="sm">
               编辑应用
             </Button>
           </CreateAppDialog>
-          <Button onClick={() => setIsUploadDialogOpen(true)}>
+          <Button onClick={() => setIsUploadDialogOpen(true)} size="sm">
             上传新版本
           </Button>
           <UploadVersionDialog
@@ -242,7 +242,7 @@ export function AppDetails({ app, onAppUpdate }: AppDetailsProps) {
       </div>
 
       {/* 统计卡片 */}
-      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-6 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs mb-8 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs mb-8 sm:grid-cols-2 md:grid-cols-4">
         <Card className="@container/card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
             <CardTitle className="text-sm font-medium">应用名称</CardTitle>

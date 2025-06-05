@@ -65,9 +65,11 @@ export async function getDatabase(): Promise<{
       password TEXT NOT NULL,
       role TEXT NOT NULL DEFAULT 'user',
       isActive INTEGER NOT NULL DEFAULT 1,
+      created_by TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      last_login DATETIME
+      last_login DATETIME,
+      FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE SET NULL
     )
   `)
 
@@ -87,8 +89,10 @@ export async function getDatabase(): Promise<{
       uploadDate TEXT,
       downloadUrl TEXT,
       description TEXT,
+      owner_id TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE
     )
   `)
 
@@ -132,11 +136,21 @@ export async function getDatabase(): Promise<{
 
   // 数据库迁移：添加新字段
   try {
-    // 检查是否需要添加字段
+    // 检查用户表是否需要添加 created_by 字段
+    const userColumns = db.prepare('PRAGMA table_info(users)').all() as ColumnInfo[]
+    const hasCreatedBy = userColumns.some((col: ColumnInfo) => col.name === 'created_by')
+    
+    if (!hasCreatedBy) {
+      db.exec('ALTER TABLE users ADD COLUMN created_by TEXT REFERENCES users(id) ON DELETE SET NULL')
+      console.log('✅ Added created_by field to users table')
+    }
+
+    // 检查应用表是否需要添加字段
     const columns = db.prepare('PRAGMA table_info(apps)').all() as ColumnInfo[]
     const hasAppName = columns.some((col: ColumnInfo) => col.name === 'appName')
     const hasAppKey = columns.some((col: ColumnInfo) => col.name === 'appKey')
     const hasDownloadKey = columns.some((col: ColumnInfo) => col.name === 'downloadKey')
+    const hasOwnerId = columns.some((col: ColumnInfo) => col.name === 'owner_id')
     
     if (!hasAppName) {
       db.exec('ALTER TABLE apps ADD COLUMN appName TEXT')
@@ -164,6 +178,21 @@ export async function getDatabase(): Promise<{
       }
       // 添加唯一约束
       db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_apps_downloadkey ON apps(downloadKey)')
+    }
+
+    // 检查是否需要添加 owner_id 字段
+    if (!hasOwnerId) {
+      // 首先获取第一个管理员用户作为默认所有者
+      const defaultOwner = db.prepare('SELECT id FROM users WHERE role IN (?, ?) ORDER BY created_at ASC LIMIT 1').get(['super_admin', 'admin']) as { id: string } | undefined
+      
+      if (defaultOwner) {
+        db.exec('ALTER TABLE apps ADD COLUMN owner_id TEXT REFERENCES users(id) ON DELETE CASCADE')
+        // 为现有应用设置默认所有者
+        db.prepare('UPDATE apps SET owner_id = ? WHERE owner_id IS NULL').run([defaultOwner.id])
+        console.log('✅ Added owner_id field to apps table and set default owner')
+      } else {
+        console.warn('⚠️ No admin user found to set as default app owner')
+      }
     }
 
     // 检查versions表是否需要添加platform字段

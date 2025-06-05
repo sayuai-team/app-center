@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,10 +55,13 @@ export function ActivityBar({
   user,
 }: ActivityBarProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleItemClick = (index: number, item: ActivityBarItem) => {
-    if (index !== currentSelectedIndex) {
-      onSelect?.(index, item);
+    // 总是调用onSelect来确保状态同步
+    onSelect?.(index, item);
+    // 如果路径不同，才进行导航
+    if (pathname !== item.path) {
       router.push(item.path);
     }
   };
@@ -88,7 +91,7 @@ export function ActivityBar({
     )}>
       {/* Activity Bar Items */}
       <ScrollArea className="flex-1">
-        <div className="flex flex-col items-center gap-1 p-2 pt-4">
+        <div className="flex flex-col items-center gap-3 p-2 pt-4">
           <TooltipProvider delayDuration={0}>
             {items.map((item, index) => (
               <Tooltip key={item.id}>

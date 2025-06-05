@@ -53,6 +53,16 @@ export const RESPONSE_CODES = {
     PROCESSING_ERROR: 'FL5001',           // 文件处理失败
   },
 
+  // 用户模块 (US + HTTP状态码)
+  USER: {
+    NOT_FOUND: 'US4041',                  // 用户不存在
+    MISSING_FIELDS: 'US4001',             // 缺少必填字段
+    INVALID_ROLE: 'US4002',               // 无效的用户角色
+    CREATE_SUCCESS: '0',                  // 用户创建成功
+    UPDATE_SUCCESS: '0',                  // 用户更新成功
+    DELETE_SUCCESS: '0',                  // 用户删除成功
+  },
+
   // 系统模块 (SY + HTTP状态码)
   SYSTEM: {
     INTERNAL_ERROR: 'SY5001',             // 内部服务器错误
@@ -104,6 +114,11 @@ export const RESPONSE_MESSAGES: Record<string, string> = {
   [RESPONSE_CODES.FILE.INVALID_FORMAT]: '只允许上传 .ipa 或 .apk 文件',
   [RESPONSE_CODES.FILE.PARSE_ERROR]: '无法解析应用文件，请确保上传的是有效的 IPA 或 APK 文件',
   [RESPONSE_CODES.FILE.PROCESSING_ERROR]: '文件处理失败',
+
+  // 用户模块消息
+  [RESPONSE_CODES.USER.NOT_FOUND]: '用户不存在',
+  [RESPONSE_CODES.USER.MISSING_FIELDS]: '缺少必填字段',
+  [RESPONSE_CODES.USER.INVALID_ROLE]: '无效的用户角色',
 
   // 系统模块消息
   [RESPONSE_CODES.SYSTEM.INTERNAL_ERROR]: '内部服务器错误',

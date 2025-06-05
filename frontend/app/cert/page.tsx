@@ -9,11 +9,14 @@ import QRCode from "qrcode"
 export default function CertificatePage() {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("")
   const [currentUrl, setCurrentUrl] = useState<string>("")
+  const [currentOrigin, setCurrentOrigin] = useState<string>("")
 
   useEffect(() => {
     // 获取当前页面的完整URL
     const url = window.location.href
+    const origin = window.location.origin
     setCurrentUrl(url)
+    setCurrentOrigin(origin)
     
     // 生成二维码
     QRCode.toDataURL(url, {
@@ -31,7 +34,9 @@ export default function CertificatePage() {
   }, [])
 
   const handleDownloadCert = () => {
-    window.location.href = '/192.168.8.111.pem'
+    // 动态获取当前域名的证书文件
+    const hostname = window.location.hostname;
+    window.location.href = `/${hostname}.pem`
   }
 
   const handleCopyUrl = async () => {
@@ -84,7 +89,7 @@ export default function CertificatePage() {
             </div>
             <div className="text-center space-y-2">
               <p className="text-xs text-muted-foreground">
-                访问地址: https://192.168.8.111:3000/cert
+                访问地址: {currentUrl}
               </p>
               <Button 
                 variant="outline" 
@@ -167,7 +172,7 @@ export default function CertificatePage() {
             <div className="text-xs text-muted-foreground space-y-2">
               <div className="font-medium text-orange-600">⚠️ 安全提示</div>
               <div>此证书仅用于测试环境，请勿在生产环境中使用。</div>
-              <div>安装后可以正常访问 https://192.168.8.111:3000 并安装企业应用。</div>
+              <div>安装后可以正常访问 {currentOrigin} 并安装企业应用。</div>
             </div>
           </CardContent>
         </Card>

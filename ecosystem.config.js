@@ -16,9 +16,9 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 8000
       },
-      error_file: './backend/logs/backend-error.log',
-      out_file: './backend/logs/backend-out.log',
-      log_file: './backend/logs/backend-combined.log',
+      error_file: './data/logs/backend-error.log',
+      out_file: './data/logs/backend-out.log',
+      log_file: './data/logs/backend-combined.log',
       time: true
     },
     {
@@ -38,9 +38,9 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3000
       },
-      error_file: './frontend/logs/frontend-error.log',
-      out_file: './frontend/logs/frontend-out.log',
-      log_file: './frontend/logs/frontend-combined.log',
+      error_file: './data/logs/frontend-error.log',
+      out_file: './data/logs/frontend-out.log',
+      log_file: './data/logs/frontend-combined.log',
       time: true
     }
   ]

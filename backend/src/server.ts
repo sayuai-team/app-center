@@ -43,6 +43,7 @@ import downloadRoutes from './routes/download';
 import versionRoutes from './routes/versions';
 import fileRoutes from './routes/files';
 import healthRoutes from './routes/health';
+import userRoutes from './routes/users';
 
 // 启用全局错误处理
 setupGlobalErrorHandlers();
@@ -129,6 +130,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/download', downloadRoutes);
 app.use('/api/v1/apps', versionRoutes);
 app.use('/api/v1/files', fileRoutes);
+app.use('/api/v1/users', userRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

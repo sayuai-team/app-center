@@ -23,13 +23,24 @@ export class AppService {
     return result
   }
 
-  // 获取所有应用
+  // 获取所有应用（超级管理员权限）
   static async getAllApps(): Promise<App[]> {
     const db = await getDatabase()
     const apps = await db.all(`
       SELECT * FROM apps 
       ORDER BY created_at DESC
     `)
+    return apps as App[]
+  }
+
+  // 根据所有者获取应用（管理员权限）
+  static async getAppsByOwner(ownerId: string): Promise<App[]> {
+    const db = await getDatabase()
+    const apps = await db.all(`
+      SELECT * FROM apps 
+      WHERE owner_id = ?
+      ORDER BY created_at DESC
+    `, [ownerId])
     return apps as App[]
   }
 
@@ -77,8 +88,8 @@ export class AppService {
     }
     
     await db.run(`
-      INSERT INTO apps (id, name, appName, appKey, icon, system, bundleId, version, buildNumber, uploadDate, downloadUrl, description, downloadKey)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO apps (id, name, appName, appKey, icon, system, bundleId, version, buildNumber, uploadDate, downloadUrl, description, downloadKey, owner_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       id, 
       app.name, 
@@ -92,7 +103,8 @@ export class AppService {
       app.uploadDate, 
       app.downloadUrl || null, 
       app.description || null,
-      downloadKey
+      downloadKey,
+      app.owner_id
     ])
 
     const newApp = await this.getAppById(id)
@@ -278,6 +290,14 @@ export class AppService {
       return // 已有数据，不需要初始化
     }
 
+    // 获取第一个管理员用户作为默认所有者
+    const defaultOwner = await db.get('SELECT id FROM users WHERE role IN (?, ?) ORDER BY created_at ASC LIMIT 1', ['super_admin', 'admin']) as { id: string } | undefined
+    
+    if (!defaultOwner) {
+      console.warn('⚠️ No admin user found, skipping sample data initialization')
+      return
+    }
+
     const sampleApps = [
       {
         name: "MyApp iOS",
@@ -286,7 +306,8 @@ export class AppService {
         bundleId: "com.example.myapp",
         version: "1.2.0",
         buildNumber: "123",
-        uploadDate: "2024-01-15"
+        uploadDate: "2024-01-15",
+        owner_id: defaultOwner.id
       },
       {
         name: "MyApp Android",
@@ -295,7 +316,8 @@ export class AppService {
         bundleId: "com.example.myapp.android",
         version: "1.1.5",
         buildNumber: "456",
-        uploadDate: "2024-01-10"
+        uploadDate: "2024-01-10",
+        owner_id: defaultOwner.id
       }
     ]
 

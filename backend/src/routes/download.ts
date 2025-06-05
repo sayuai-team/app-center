@@ -68,7 +68,7 @@ router.get('/:downloadKey/plist', async (req: Request, res: Response, next: Next
     // 构建可从外部访问的下载URL
     if (downloadUrl) {
       // 获取请求的host（去除端口号）
-      const requestHost = req.get('host')?.replace(':8000', '') || '192.168.8.111';
+      const requestHost = req.get('host')?.replace(':8000', '') || req.get('x-forwarded-host') || 'localhost';
       
       // 替换localhost为实际的IP，并确保使用HTTPS
       if (downloadUrl.includes('localhost')) {

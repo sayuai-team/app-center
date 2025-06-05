@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 next dev --port 3000 --experimental-https --experimental-https-key ../certs/192.168.8.111-key.pem --experimental-https-cert ../certs/192.168.8.111.pem",
+    "dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 next dev --port 3000 --experimental-https --experimental-https-key ../data/certs/192.168.8.111-key.pem --experimental-https-cert ../data/certs/192.168.8.111.pem",
     "build": "next build",
     "start": "next start --port 3000",
     "lint": "next lint",

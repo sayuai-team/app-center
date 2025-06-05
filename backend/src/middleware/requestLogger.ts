@@ -4,7 +4,7 @@ import * as path from 'path';
 import { generateId } from '../utils/idGenerator';
 
 // 创建日志目录
-const logsDir = path.join(process.cwd(), 'logs');
+const logsDir = path.join(process.cwd(), '../data/logs');
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }

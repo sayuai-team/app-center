@@ -15,9 +15,11 @@ CREATE TABLE IF NOT EXISTS users (
     password TEXT NOT NULL,                        -- 加密后的密码
     role TEXT NOT NULL DEFAULT 'user',             -- 用户角色: super_admin, admin, user
     isActive INTEGER NOT NULL DEFAULT 1,           -- 是否启用: 1=启用, 0=禁用
+    created_by TEXT,                               -- 创建者ID (super_admin创建admin时使用)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- 创建时间
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- 更新时间
-    last_login DATETIME                            -- 最后登录时间
+    last_login DATETIME,                           -- 最后登录时间
+    FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE SET NULL
 );
 
 -- 应用表
@@ -35,8 +37,10 @@ CREATE TABLE IF NOT EXISTS apps (
     uploadDate TEXT,                              -- 上传日期
     downloadUrl TEXT,                             -- 下载链接
     description TEXT,                             -- 应用描述
+    owner_id TEXT NOT NULL,                       -- 应用所有者ID (管理员用户)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- 创建时间
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP  -- 更新时间
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- 更新时间
+    FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 -- 版本表
@@ -89,6 +93,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_apps_appkey ON apps(appKey);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_apps_downloadkey ON apps(downloadKey);
 CREATE INDEX IF NOT EXISTS idx_apps_system ON apps(system);
 CREATE INDEX IF NOT EXISTS idx_apps_bundle ON apps(bundleId);
+CREATE INDEX IF NOT EXISTS idx_apps_owner ON apps(owner_id);
 CREATE INDEX IF NOT EXISTS idx_apps_created ON apps(created_at);
 
 -- 版本表索引

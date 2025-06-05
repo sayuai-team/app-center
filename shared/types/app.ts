@@ -12,6 +12,7 @@ export interface App {
   uploadDate: string
   downloadUrl?: string
   description?: string
+  owner_id: string // 应用所有者ID (管理员用户)
 }
 
 export interface Version {

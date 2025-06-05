@@ -40,7 +40,7 @@ const DEFAULT_ACTIVITY_BAR_WIDTH = 64;
 const DEFAULT_PRIMARY_SIDEBAR = {
   preferredSize: 280,
   minSize: 200,
-  maxSize: 350
+  maxSize: 320
 };
 const DEFAULT_SECONDARY_SIDEBAR = {
   preferredSize: 300,
@@ -65,6 +65,9 @@ export function AppCenterLayout({
   // 使用ref跟踪外部和内部更新，防止循环
   const isExternalUpdate = useRef(false);
   const prevExternalIndex = useRef(options?.currentSelectedIndex);
+  
+  // Allotment ref for reset functionality
+  const allotmentRef = useRef<any>(null);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -113,15 +116,45 @@ export function AppCenterLayout({
     }
   };
 
+  // 添加键盘事件监听，用于重置布局（Ctrl+Shift+R 或 Cmd+Shift+R）
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'r' && e.shiftKey) {
+        e.preventDefault();
+        console.log('重置 Allotment 布局...');
+        // 重置 Allotment 布局到默认尺寸
+        if (allotmentRef.current) {
+          allotmentRef.current.resize([activityBarWidth, primarySidebarConfig.preferredSize]);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activityBarWidth, primarySidebarConfig.preferredSize]);
+
   return (
     <div className={cn("flex h-screen w-screen overflow-hidden", className)}>
-      <Allotment proportionalLayout={false} separator={true} snap={true}>
+      <Allotment 
+        ref={allotmentRef}
+        defaultSizes={[activityBarWidth, primarySidebarConfig.preferredSize]}
+        proportionalLayout={false} 
+        separator={true} 
+        snap={false}
+        onChange={(sizes) => {
+          console.log('面板尺寸变化:', sizes);
+        }}
+        onDragStart={() => {
+          console.log('开始拖拽');
+        }}
+        onDragEnd={(sizes) => {
+          console.log('拖拽结束:', sizes);
+        }}
+      >
         {/* Activity Bar */}
         <Allotment.Pane
-          preferredSize={activityBarWidth}
           minSize={activityBarWidth}
           maxSize={activityBarWidth}
-          snap
         >
           <ActivityBar
             items={options.items || []}
@@ -134,10 +167,8 @@ export function AppCenterLayout({
         {/* Primary Sidebar */}
         {primaryContent && (
           <Allotment.Pane
-            preferredSize={primarySidebarConfig.preferredSize}
             minSize={primarySidebarConfig.minSize}
             maxSize={primarySidebarConfig.maxSize}
-            snap
           >
             <div className="flex h-full w-full flex-col overflow-auto bg-background border-r border-border">
               <div className="flex-1 overflow-auto">
@@ -149,11 +180,13 @@ export function AppCenterLayout({
 
         {/* Main Content */}
         {mainContent && (
-          <Allotment.Pane minSize={400}>
+          <Allotment.Pane>
             <div className="h-full bg-background">
-              <div className="flex h-full w-full flex-col overflow-auto">
-                <div className="flex-1 overflow-auto">
-                  {mainContent}
+              <div className="flex h-full w-full flex-col overflow-hidden">
+                <div className="flex-1 overflow-auto min-w-0">
+                  <div className="w-full min-w-0">
+                    {mainContent}
+                  </div>
                 </div>
               </div>
             </div>

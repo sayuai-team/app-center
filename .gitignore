@@ -19,6 +19,10 @@ Thumbs.db
 # Logs
 logs
 *.log
+data/logs/
+data/database/*.sqlite
+data/database/*.db
+data/uploads/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -123,6 +127,11 @@ temp/
 *.crt
 *.cert
 !cert.example.*
+data/certs/*.pem
+data/certs/*.key
+data/certs/*.crt
+data/certs/*.cert
+!data/certs/cert.conf
 
 # Package manager lock files (optional - uncomment if you want to ignore them)
 # pnpm-lock.yaml

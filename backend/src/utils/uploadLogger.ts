@@ -6,30 +6,37 @@ class UploadLogger {
 
   constructor() {
     // 创建logs目录
-    const logsDir = path.join(process.cwd(), 'logs');
+    const logsDir = path.join(process.cwd(), '../data/logs');
     if (!fs.existsSync(logsDir)) {
       fs.mkdirSync(logsDir, { recursive: true });
     }
     
-    // 使用日期作为日志文件名
-    const today = new Date().toISOString().split('T')[0];
+    // 使用北京时间的日期作为日志文件名
+    const now = new Date();
+    const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+    const today = beijingTime.toISOString().split('T')[0];
     this.logFilePath = path.join(logsDir, `upload-${today}.log`);
   }
 
   private formatTimestamp(): string {
-    return new Date().toISOString();
+    const now = new Date();
+    // 北京时间 = UTC时间 + 8小时
+    const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+    return beijingTime.toISOString().replace('T', ' ').substring(0, 23);
   }
 
   private writeLog(level: string, message: string, data?: any): void {
     const timestamp = this.formatTimestamp();
-    const logEntry = {
-      timestamp,
-      level,
-      message,
-      data: data || null
-    };
     
-    const logLine = JSON.stringify(logEntry) + '\n';
+    // 使用与request log相同的格式：[timestamp] level: message
+    let logLine = `[${timestamp}] ${level}: ${message}`;
+    
+    // 如果有数据，以JSON格式添加到后面
+    if (data) {
+      logLine += ` | Data: ${JSON.stringify(data)}`;
+    }
+    
+    logLine += '\n';
     
     try {
       fs.appendFileSync(this.logFilePath, logLine);

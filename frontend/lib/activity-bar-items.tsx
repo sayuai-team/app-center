@@ -7,36 +7,15 @@ export const appCenterActivityItems: ActivityBarItem[] = [
     id: "apps",
     name: "Applications",
     icon: <Package className="h-5 w-5" />,
-    path: "/dashboard",
+    path: "/dashboard/apps",
     order: 1
-  },
-  {
-    id: "upload",
-    name: "Upload",
-    icon: <Upload className="h-5 w-5" />,
-    path: "/dashboard/upload",
-    order: 2
-  },
-  {
-    id: "install",
-    name: "Install",
-    icon: <Monitor className="h-5 w-5" />,
-    path: "/install",
-    order: 3
   },
   {
     id: "users",
     name: "Users",
     icon: <Users className="h-5 w-5" />,
     path: "/dashboard/users",
-    order: 4
-  },
-  {
-    id: "settings",
-    name: "Settings",
-    icon: <Settings className="h-5 w-5" />,
-    path: "/dashboard/settings",
-    order: 5
+    order: 2
   }
 ];
 

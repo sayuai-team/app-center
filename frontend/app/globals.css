@@ -120,3 +120,51 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Allotment 分隔线样式，使用更合适的颜色 */
+:root {
+  --focus-border: hsl(var(--ring));
+  --separator-border: hsl(0 0% 85%);
+}
+
+.dark {
+  --focus-border: hsl(var(--ring));
+  --separator-border: hsl(0 0% 20%);
+}
+
+/* 调整 Allotment 分隔线的样式 */
+.sash {
+  background-color: transparent !important;
+}
+
+.sash:after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 0.5px;
+  background-color: var(--separator-border);
+  transform: translateX(-50%);
+  opacity: 0.6;
+}
+
+.sash-horizontal:after {
+  left: 0;
+  right: 0;
+  top: 50%;
+  bottom: auto;
+  width: auto;
+  height: 0.5px;
+  transform: translateY(-50%);
+  opacity: 0.6;
+}
+
+.sash:hover:after {
+  background-color: var(--focus-border);
+  width: 1px;
+}
+
+.sash-horizontal:hover:after {
+  height: 1px;
+}
