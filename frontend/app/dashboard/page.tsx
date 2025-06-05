@@ -1,18 +1,40 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { AppCenterLayout } from "@/components/app-center-layout"
 import { AppSidebar } from "@/components/app-sidebar"
 import { AppDetails } from "@/components/app-details"
 import { SiteHeader } from "@/components/site-header"
 import { useApps } from "@/hooks/use-apps"
 import { App } from "@app-center/shared"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
+import { sortedAppCenterActivityItems } from "@/lib/activity-bar-items"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function DashboardPage() {
   const { apps, isLoading, error, refetch } = useApps()
+  const { userInfo, isLoading: authLoading, isAuthenticated } = useAuth()
   const [selectedApp, setSelectedApp] = useState<App | null>(null)
+  const [currentActivityIndex, setCurrentActivityIndex] = useState(0)
   const router = useRouter()
+  const pathname = usePathname()
+
+  // 准备用户数据供ActivityBar使用
+  const userData = userInfo ? {
+    name: userInfo.username,
+    email: userInfo.email,
+    avatar: "/avatars/default.svg"
+  } : null
+
+  // 根据当前路径设置活动的 ActivityBar 项目
+  useEffect(() => {
+    const currentIndex = sortedAppCenterActivityItems.findIndex(item =>
+      pathname === item.path || pathname.startsWith(item.path + '/')
+    )
+    if (currentIndex !== -1) {
+      setCurrentActivityIndex(currentIndex)
+    }
+  }, [pathname])
 
   // 检查登录状态
   useEffect(() => {
@@ -89,24 +111,40 @@ export default function DashboardPage() {
   }
 
   return (
-    <SidebarProvider>
-      <AppSidebar 
-        variant="inset"
-        apps={apps} 
-        selectedApp={selectedApp} 
-        onSelectApp={setSelectedApp}
-        onAppUpdate={refetch}
-      />
-      <SidebarInset>
-        <SiteHeader />
+    <AppCenterLayout
+      options={{
+        currentSelectedIndex: currentActivityIndex,
+        items: sortedAppCenterActivityItems,
+        activityBarWidth: 64,
+        primarySidebar: {
+          preferredSize: 280,
+          minSize: 200,
+          maxSize: 400
+        }
+      }}
+      user={userData}
+      primaryContent={
+        <AppSidebar 
+          apps={apps} 
+          selectedApp={selectedApp} 
+          onSelectApp={setSelectedApp}
+          onAppUpdate={refetch}
+        />
+      }
+      mainContent={
         <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
+          <SiteHeader />
+          <div className="@container/main flex flex-1 flex-col gap-2 p-4">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <AppDetails app={selectedApp} onAppUpdate={refetch} />
             </div>
           </div>
         </div>
-      </SidebarInset>
-    </SidebarProvider>
+      }
+      onViewChange={(index, item) => {
+        setCurrentActivityIndex(index)
+        // 导航将由 ActivityBar 组件内部处理
+      }}
+    />
   )
 } 
